@@ -35,6 +35,13 @@ def fetch_signing_secret(_module, _opts) do
     |> JOSE.JWK.from_pem_file()
   end
   ```
+  
+  Example can be verified with the following commands
+ ``` elixir 
+ {:ok,token,_} = PemGuardian.Guardian.encode_and_sign(%{id: "1"})
+ PemGuardian.Guardian.decode_and_verify(token) 
+ ```
+
 
 
 
