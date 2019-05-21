@@ -1,4 +1,4 @@
-defmodule DebugGuardian.SecretFetcher do
+defmodule PemGuardian.SecretFetcher do
   use Guardian.Token.Jwt.SecretFetcher
 
   def fetch_signing_secret(_module, _opts) do
@@ -18,7 +18,7 @@ defmodule DebugGuardian.SecretFetcher do
   end
 
   defp fetch(relative_path) do
-    :code.priv_dir(:debug_guardian)
+    :code.priv_dir(:pem_guardian)
     |> Path.join(relative_path)
     |> JOSE.JWK.from_pem_file()
   end

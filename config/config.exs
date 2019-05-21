@@ -28,7 +28,7 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env()}.exs"
-config :debug_guardian, DebugGuardian.Guardian,
-  issuer: "debug_guardian",
+config :pem_guardian, PemGuardian.Guardian,
+  issuer: "pem_guardian",
   allowed_algos: ["RS512"],
-  secret_fetcher: DebugGuardian.SecretFetcher
+  secret_fetcher: PemGuardian.SecretFetcher
