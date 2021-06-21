@@ -41,7 +41,7 @@ defmodule PemGuardian.SecretFetcher do
 
   defp fetch_key(relative_path) do
     try do
-      :code.priv_dir(:mock_idp)
+      :code.priv_dir(:pem_guardian)
       |> Path.join(relative_path)
       |> JOSE.JWK.from_pem_file()
     rescue
