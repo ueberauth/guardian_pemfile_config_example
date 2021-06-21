@@ -1,9 +1,9 @@
-# Example of a guardian configuration using a private and public pem file
+# Example of a Guardian configuration using a private and public pem file
 
 *This is just an example of how to get up and running and should not be used in production*
 
 ### Highlights
-Pem files are put in the priv folder and fetched with the secret handler which is configured in the config file.
+pem files are put in the priv folder and fetched with the secret handler which is configured in the config file.
 
 ```elixir
 config :pem_guardian, PemGuardian.Guardian,
@@ -12,36 +12,47 @@ config :pem_guardian, PemGuardian.Guardian,
   secret_fetcher: PemGuardian.SecretFetcher
 ```
 
-``` elixir 
-def fetch_signing_secret(_module, _opts) do
-    secret =
-      "rsa-2048.pem"
-      |> fetch()
+```elixir
+defmodule PemGuardian.SecretFetcher do
+  @behaviour Guardian.Token.Jwt.SecretFetcher
 
-    {:ok, secret}
+  @impl true
+  def fetch_signing_secret(_module, _opts) do
+    "rsa-2048.pem"
+    |> fetch()
   end
 
+  @impl true
   def fetch_verifying_secret(_module, _headers, _opts) do
-    secret =
-      "rsa-2048.pub"
-      |> fetch()
-
-    {:ok, secret}
+    "rsa-2048.pub"
+    |> fetch()
   end
 
   defp fetch(relative_path) do
-    :code.priv_dir(:debug_guardian)
-    |> Path.join(relative_path)
-    |> JOSE.JWK.from_pem_file()
+    secret =
+      relative_path
+      |> fetch_key()
+
+    case secret do
+      :error -> {:error, :secret_not_found}
+      _ -> {:ok, secret}
+    end
   end
-  ```
+
+  defp fetch_key(relative_path) do
+    try do
+      :code.priv_dir(:pem_guardian)
+      |> Path.join(relative_path)
+      |> JOSE.JWK.from_pem_file()
+    rescue
+      _ -> :error
+    end
+  end
+end
+```
   
-  Example can be verified with the following commands
- ``` elixir 
- {:ok,token,_} = PemGuardian.Guardian.encode_and_sign(%{id: "1"})
- PemGuardian.Guardian.decode_and_verify(token) 
- ```
-
-
-
-
+Example can be verified with the following commands
+```elixir 
+{:ok,token,_} = PemGuardian.Guardian.encode_and_sign(%{id: "1"})
+PemGuardian.Guardian.decode_and_verify(token) 
+```
